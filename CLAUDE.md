@@ -1,0 +1,1 @@
+.agent/shared/spring-boot/AGENTS.md
