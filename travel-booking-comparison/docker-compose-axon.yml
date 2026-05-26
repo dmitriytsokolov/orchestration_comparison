@@ -1,0 +1,9 @@
+include:
+  - docker-compose-shared.yml
+
+services:
+  axonserver:
+    image: axoniq/axonserver:2026.0.1
+    ports:
+      - "8024:8024"
+      - "8124:8124"

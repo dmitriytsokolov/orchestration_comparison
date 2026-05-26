@@ -1,0 +1,36 @@
+include:
+  - docker-compose-shared.yml
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.13.0
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+
+  zeebe:
+    image: camunda/zeebe:8.7.0
+    depends_on:
+      - elasticsearch
+    environment:
+      ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_CLASSNAME: io.camunda.zeebe.exporter.ElasticsearchExporter
+      ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_URL: http://elasticsearch:9200
+      ZEEBE_BROKER_GATEWAY_ENABLE: "true"
+    ports:
+      - "26500:26500"
+      - "9600:9600"
+
+  camunda-operate:
+    image: camunda/operate:8.7.0
+    depends_on:
+      - zeebe
+      - elasticsearch
+    environment:
+      CAMUNDA_OPERATE_ZEEBE_GATEWAYADDRESS: zeebe:26500
+      CAMUNDA_OPERATE_ELASTICSEARCH_URL: http://elasticsearch:9200
+      CAMUNDA_OPERATE_ZEEBEELASTICSEARCH_URL: http://elasticsearch:9200
+    ports:
+      - "8081:8080"

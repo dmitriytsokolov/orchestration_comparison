@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/payments/capture"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "successful": true,
+      "gatewayRef": "gw-{{randomValue length=12 type='ALPHANUMERIC'}}",
+      "failureReason": null
+    }
+  }
+}

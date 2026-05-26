@@ -1,0 +1,23 @@
+{
+  "priority": 2,
+  "request": {
+    "method": "POST",
+    "url": "/payments/capture",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$[?(@.idempotencyKey =~ /.*fail.*/)]"
+      }
+    ]
+  },
+  "response": {
+    "status": 402,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "successful": false,
+      "gatewayRef": null,
+      "failureReason": "Card declined"
+    }
+  }
+}

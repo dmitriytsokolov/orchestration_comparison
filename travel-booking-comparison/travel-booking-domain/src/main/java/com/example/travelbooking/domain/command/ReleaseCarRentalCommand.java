@@ -1,0 +1,6 @@
+package com.example.travelbooking.domain.command;
+
+import java.util.UUID;
+
+public record ReleaseCarRentalCommand(UUID carRentalId, UUID bookingId) {
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  id="Definitions_booking_cancellation"
+                  targetNamespace="http://example.com/travel-booking">
+  <bpmn:process id="booking-cancellation" name="Booking Cancellation" isExecutable="true">
+    <bpmn:startEvent id="StartCancellation">
+      <bpmn:outgoing>Flow_refund</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="InitiateRefund">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="initiate-refund" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_refund</bpmn:incoming>
+      <bpmn:outgoing>Flow_release_reservations</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ReleaseReservations">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="release-reservations-on-cancel" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_release_reservations</bpmn:incoming>
+      <bpmn:outgoing>Flow_cancel_confirm</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ConfirmCancellation">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="confirm-cancellation" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_cancel_confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_cancel_email</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="SendCancellationEmail">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-cancellation-email" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_cancel_email</bpmn:incoming>
+      <bpmn:outgoing>Flow_cancel_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndCancellation">
+      <bpmn:incoming>Flow_cancel_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_refund" sourceRef="StartCancellation" targetRef="InitiateRefund"/>
+    <bpmn:sequenceFlow id="Flow_release_reservations" sourceRef="InitiateRefund" targetRef="ReleaseReservations"/>
+    <bpmn:sequenceFlow id="Flow_cancel_confirm" sourceRef="ReleaseReservations" targetRef="ConfirmCancellation"/>
+    <bpmn:sequenceFlow id="Flow_cancel_email" sourceRef="ConfirmCancellation" targetRef="SendCancellationEmail"/>
+    <bpmn:sequenceFlow id="Flow_cancel_end" sourceRef="SendCancellationEmail" targetRef="EndCancellation"/>
+  </bpmn:process>
+</bpmn:definitions>

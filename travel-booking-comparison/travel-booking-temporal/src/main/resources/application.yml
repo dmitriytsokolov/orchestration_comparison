@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/travel_booking
+    username: travel
+    password: travel
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  mail:
+    host: localhost
+    port: 1025
+  temporal:
+    connection:
+      target: localhost:7233
+    namespace: default
+    workers:
+      - task-queue: travel-booking
+        workflow-classes:
+          - com.example.travelbooking.temporal.workflow.TripBookingWorkflowImpl
+          - com.example.travelbooking.temporal.workflow.CancellationWorkflowImpl
+        activity-beans:
+          - flightActivitiesImpl
+          - hotelActivitiesImpl
+          - carRentalActivitiesImpl
+          - paymentActivitiesImpl
+          - bookingActivitiesImpl
+          - notificationActivitiesImpl
+
+travel-booking:
+  payment-gateway:
+    base-url: http://localhost:8089

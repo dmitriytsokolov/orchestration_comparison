@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  id="Definitions_booking_modification"
+                  targetNamespace="http://example.com/travel-booking">
+  <bpmn:process id="booking-modification" name="Booking Modification" isExecutable="true">
+    <bpmn:startEvent id="StartModification">
+      <bpmn:outgoing>Flow_modify</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="ModifyBooking">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="modify-booking" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_modify</bpmn:incoming>
+      <bpmn:outgoing>Flow_modify_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndModification">
+      <bpmn:incoming>Flow_modify_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_modify" sourceRef="StartModification" targetRef="ModifyBooking"/>
+    <bpmn:sequenceFlow id="Flow_modify_end" sourceRef="ModifyBooking" targetRef="EndModification"/>
+  </bpmn:process>
+</bpmn:definitions>

@@ -1,0 +1,24 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "url": "/payments/capture",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$[?(@.idempotencyKey =~ /.*timeout.*/)]"
+      }
+    ]
+  },
+  "response": {
+    "status": 504,
+    "fixedDelayMilliseconds": 10000,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "successful": false,
+      "gatewayRef": null,
+      "failureReason": "Gateway timeout"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  id="Definitions_trip_booking"
+                  targetNamespace="http://example.com/travel-booking">
+  <bpmn:process id="trip-booking" name="Trip Booking" isExecutable="true">
+    <bpmn:startEvent id="StartEvent" name="Booking requested">
+      <bpmn:outgoing>Flow_start_flight</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="ReserveFlight" name="Reserve flight">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="reserve-flight" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_flight</bpmn:incoming>
+      <bpmn:outgoing>Flow_flight_hotel</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ReserveHotel" name="Reserve hotel">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="reserve-hotel" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_flight_hotel</bpmn:incoming>
+      <bpmn:outgoing>Flow_hotel_car</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ReserveCar" name="Reserve car">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="reserve-car" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_hotel_car</bpmn:incoming>
+      <bpmn:outgoing>Flow_car_payment</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ProcessPayment" name="Process payment">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="process-payment" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_car_payment</bpmn:incoming>
+      <bpmn:outgoing>Flow_payment_confirm</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="ConfirmBooking" name="Confirm booking">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="confirm-booking" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_payment_confirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_confirm_email</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="SendConfirmation" name="Send confirmation">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-confirmation" retries="3"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_confirm_email</bpmn:incoming>
+      <bpmn:outgoing>Flow_email_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent" name="Booking confirmed">
+      <bpmn:incoming>Flow_email_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_start_flight" sourceRef="StartEvent" targetRef="ReserveFlight"/>
+    <bpmn:sequenceFlow id="Flow_flight_hotel" sourceRef="ReserveFlight" targetRef="ReserveHotel"/>
+    <bpmn:sequenceFlow id="Flow_hotel_car" sourceRef="ReserveHotel" targetRef="ReserveCar"/>
+    <bpmn:sequenceFlow id="Flow_car_payment" sourceRef="ReserveCar" targetRef="ProcessPayment"/>
+    <bpmn:sequenceFlow id="Flow_payment_confirm" sourceRef="ProcessPayment" targetRef="ConfirmBooking"/>
+    <bpmn:sequenceFlow id="Flow_confirm_email" sourceRef="ConfirmBooking" targetRef="SendConfirmation"/>
+    <bpmn:sequenceFlow id="Flow_email_end" sourceRef="SendConfirmation" targetRef="EndEvent"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_trip_booking">
+    <bpmndi:BPMNPlane id="BPMNPlane_trip_booking" bpmnElement="trip-booking"/>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

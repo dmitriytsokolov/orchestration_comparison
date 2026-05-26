@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/payments/refund"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "successful": true,
+      "gatewayRef": "{{jsonPath request.body '$.gatewayRef'}}"
+    }
+  }
+}

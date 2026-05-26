@@ -1,0 +1,22 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/travel_booking
+    username: travel
+    password: travel
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  mail:
+    host: localhost
+    port: 1025
+
+axon:
+  axonserver:
+    servers: localhost:8124
+
+travel-booking:
+  payment-gateway:
+    base-url: http://localhost:8089
